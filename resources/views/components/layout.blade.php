@@ -7,7 +7,7 @@
 
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
-    html{
+    html {
         scroll-behavior: smooth;
     }
 </style>
@@ -26,16 +26,36 @@
                 <a href="/login" class="ml-6 text-xs font-bold uppercase">Login</a>
             @endguest
             @auth
-                <span class="font-bold text-sm ">Welcome, {{auth()->user()->name}}</span>
+
+                <x-dropdown>
+                    <x-slot name="trigger">
+                        <button class="font-bold text-sm ">Welcome, {{auth()->user()->name}}</button>
+                    </x-slot>
+
+                    @can('admin')
+                    <x-dropdown-item href="/admin/posts" :active="request()->is('admin/posts')">Dashboard</x-dropdown-item>
+                    <x-dropdown-item href="/admin/post/create" :active="request()->is('admin/post/create')">New Post
+                    </x-dropdown-item>
+                    @endcan
+
+                    <x-dropdown-item href="#" x-data="{}"
+                                     @click.prevent="document.querySelector('#logout-form').submit()">
+                        Logout
+                    </x-dropdown-item>
+                </x-dropdown>
+
+
                 <form method="POST"
                       action="/logout"
-                      class="text-xs font-semibold text-blue-500 ml-6"
+                      class="hidden"
+                      id="logout-form"
                 >
                     @csrf
                     <button type="submit">Logout</button>
                 </form>
             @endauth
-            <a href="#subscribe" class="bg-blue-500 ml-3 rounded-full text-xs font-semibold text-white uppercase py-3 px-5">
+            <a href="#subscribe"
+               class="bg-blue-500 ml-3 rounded-full text-xs font-semibold text-white uppercase py-3 px-5">
                 Subscribe for Updates
             </a>
         </div>

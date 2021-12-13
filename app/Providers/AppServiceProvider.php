@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use App\Services\MailchimpNewsletter;
 use App\Services\Newsletter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use MailchimpMarketing\ApiClient;
 
@@ -26,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             return new MailchimpNewsletter($client);
         });
+
     }
 
     /**
@@ -37,5 +41,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useTailwind();
         Model::unguard();
+
+        Gate::define('admin', function (User $user) {
+            return $user->username == 'awakeningconcious';
+        });
+        Blade::if('admin',function (){
+            return request()->user()?->can('admin'); //? means optional, if not return false
+        });
     }
 }
